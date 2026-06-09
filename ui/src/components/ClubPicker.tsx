@@ -38,7 +38,7 @@ export function ClubPicker({ selectedClub, onClubChange }: ClubPickerProps) {
           <div className="club-picker__overlay" onClick={() => setIsOpen(false)} />
           <div className="club-picker__dropdown">
             {Object.entries(CLUBS_BY_TYPE).map(([type, clubs]) => (
-              <div className="club-picker__section">
+              <div className="club-picker__section" key={type}>
                 <span className="club-picker__section-title">{type}</span>
                 <div className="club-picker__grid">
                   {clubs.map((club) => (
