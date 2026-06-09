@@ -1,9 +1,29 @@
-import { renderToString } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it, beforeAll } from 'vitest';
 import { UnitPreferenceProvider } from '../state/UnitPreferenceProvider';
 import type { CameraStatus } from '../hooks/useSocket';
 import type { Shot } from '../types/shot';
 import { DisplayMode } from './DisplayMode';
+
+const mockLocalStorage = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString();
+    },
+    clear: () => {
+      store = {};
+    },
+  };
+})();
+
+beforeAll(() => {
+  Object.defineProperty(window, 'localStorage', {
+    value: mockLocalStorage,
+    writable: true,
+  });
+});
 
 const cameraStatus: CameraStatus = {
   available: true,
@@ -37,16 +57,16 @@ const shot: Shot = {
 
 describe('DisplayMode', () => {
   it('renders latest shot metrics and recent shot strip', () => {
-    const html = renderToString(
+    render(
       <UnitPreferenceProvider>
         <DisplayMode connected cameraStatus={cameraStatus} latestShot={shot} shots={[shot]} />
       </UnitPreferenceProvider>,
     );
 
-    expect(html).toContain('OpenFlight Display');
-    expect(html).toContain('151.2');
-    expect(html).toContain('261');
-    expect(html).toContain('Socket connected');
-    expect(html).toContain('display-shot-chip__number');
+    expect(screen.getByText('OpenFlight Display')).toBeDefined();
+    expect(screen.getByText('151.2')).toBeDefined();
+    expect(screen.getByText('261')).toBeDefined();
+    expect(screen.getByText('Socket connected')).toBeDefined();
+    expect(screen.getByText('#1')).toBeDefined();
   });
 });
