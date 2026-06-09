@@ -21,6 +21,8 @@ import { ShotProvider } from './state/ShotProvider';
 import { UnitPreferenceProvider } from './state/UnitPreferenceProvider';
 import { useShotContext } from './state/useShotContext';
 import { useUnitPreference } from './state/useUnitPreference';
+import { SocketProvider } from './state/SocketProvider';
+import { shutdownServer } from './utils/api';
 
 import Logo from './logo/Logo';
 
@@ -65,8 +67,6 @@ function AppContent() {
     connected,
     mockMode,
     debugMode,
-    debugReadings,
-    debugShotLogs,
     radarConfig,
     cameraStatus,
     triggerDiagnostics,
@@ -74,11 +74,9 @@ function AppContent() {
     clearSession,
     setClub,
     simulateShot,
-    toggleDebug,
     updateRadarConfig,
     toggleCamera,
     toggleCameraStream,
-    shutdown,
   } = useSocket();
 
   const { latestShot, shots, isNewShot, shotVersion } = useShotContext();
@@ -202,7 +200,7 @@ function AppContent() {
           <div className="shutdown-dialog">
             <p>Shut down OpenFlight?</p>
             <div className="shutdown-dialog__buttons">
-              <button className="shutdown-dialog__confirm" onClick={() => { shutdown(); setShowShutdown(false); }}>
+              <button className="shutdown-dialog__confirm" onClick={() => { shutdownServer(); setShowShutdown(false); }}>
                 Shut Down
               </button>
               <button className="shutdown-dialog__cancel" onClick={() => setShowShutdown(false)}>
@@ -273,13 +271,8 @@ function AppContent() {
         )}
         {currentView === 'debug' && (
           <DebugPanel
-            enabled={debugMode}
-            readings={debugReadings}
-            shotLogs={debugShotLogs}
             radarConfig={radarConfig}
-            cameraStatus={cameraStatus}
             mockMode={mockMode}
-            onToggle={toggleDebug}
             onUpdateConfig={updateRadarConfig}
             triggerDiagnostics={triggerDiagnostics}
             triggerStatus={triggerStatus}
@@ -295,7 +288,9 @@ function App() {
     <LaunchDaddyProvider>
       <UnitPreferenceProvider>
         <ShotProvider>
-          <AppContent />
+          <SocketProvider>
+            <AppContent />
+          </SocketProvider>
         </ShotProvider>
       </UnitPreferenceProvider>
     </LaunchDaddyProvider>

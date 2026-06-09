@@ -1,16 +1,11 @@
 import { memo, useState } from 'react';
-import type { DebugReading, RadarConfig, DebugShotLog, CameraStatus } from '../hooks/useSocket';
+import type { RadarConfig } from '../hooks/useSocket';
 import type { TriggerDiagnostic, TriggerStatus } from '../types/shot';
 import './DebugPanel.css';
 
 interface DebugPanelProps {
-  enabled: boolean;
-  readings: DebugReading[];
-  shotLogs: DebugShotLog[];
   radarConfig: RadarConfig;
-  cameraStatus: CameraStatus;
   mockMode: boolean;
-  onToggle: () => void;
   onUpdateConfig: (config: Partial<RadarConfig>) => void;
   triggerDiagnostics: TriggerDiagnostic[];
   triggerStatus: TriggerStatus;
