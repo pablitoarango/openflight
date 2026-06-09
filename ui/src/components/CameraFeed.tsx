@@ -12,17 +12,10 @@ interface CameraFeedProps {
 const STREAM_URL = `${getServerOrigin()}/camera/stream`;
 
 export function CameraFeed({ cameraStatus, onToggleCamera, onToggleStream }: CameraFeedProps) {
-  const [streamError, setStreamError] = useState(false);
-  const [prevStreaming, setPrevStreaming] = useState(false);
+  const [failedStreamKey, setFailedStreamKey] = useState<string | null>(null);
   const { available, enabled, streaming, ball_detected, ball_confidence } = cameraStatus;
-
-  // Reset error when streaming starts
-  if (streaming && !prevStreaming) {
-    setStreamError(false);
-  }
-  if (streaming !== prevStreaming) {
-    setPrevStreaming(streaming);
-  }
+  const streamKey = `${streaming}`;
+  const streamError = failedStreamKey === streamKey;
 
   if (!available) {
     return (
@@ -79,7 +72,7 @@ export function CameraFeed({ cameraStatus, onToggleCamera, onToggleStream }: Cam
             <span className="camera-feed__icon">⚠️</span>
             <h3>Stream Error</h3>
             <p>Could not load camera stream</p>
-            <button className="camera-feed__button" onClick={() => setStreamError(false)}>
+            <button className="camera-feed__button" onClick={() => setFailedStreamKey(null)}>
               Retry
             </button>
           </div>
@@ -89,7 +82,7 @@ export function CameraFeed({ cameraStatus, onToggleCamera, onToggleStream }: Cam
               src={STREAM_URL}
               alt="Camera Feed"
               className="camera-feed__video"
-              onError={() => setStreamError(true)}
+              onError={() => setFailedStreamKey(streamKey)}
             />
             <div className="camera-feed__overlay">
               <div className={`camera-feed__status ${ball_detected ? 'camera-feed__status--detected' : ''}`}>
